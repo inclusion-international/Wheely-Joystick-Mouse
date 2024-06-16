@@ -38,7 +38,7 @@ The Intelligent Wheelchair Controller is an innovative solution that transforms 
 - 2x Puck.js microcontrollers
 - 1x Analog joystick
 - 1x Foot switch (button)
-- 1x Device to mount microcontrollers to the Wheelchair
+- 2x Device to mount microcontrollers to the Wheelchair
 
 
 The Intelligent Wheelchair Controller is the perfect solution to enhance the accessibility and independence of wheelchair users. With easy installation and user-friendly operation, users can effectively control their computers without additional assistance.
