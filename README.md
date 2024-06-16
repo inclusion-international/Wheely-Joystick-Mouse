@@ -1,7 +1,7 @@
 # Wheely-Joystick-Mouse
 
 # Product Overview:
-The Intelligent Wheelchair Controller is an innovative solution that transforms a wheelchair joystick into a PC mouse and includes an additional foot switch function for mouse clicks. This solution utilizes two Puck.js microcontrollers that communicate wirelessly via Bluetooth, ensuring seamless integration and easy operation.
+The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair joystick into a PC mouse and includes an additional foot switch function for mouse clicks. This solution utilizes two Puck.js microcontrollers that communicate wirelessly via Bluetooth, ensuring seamless integration and easy operation.
 
 # Key Features:
 
@@ -41,4 +41,4 @@ The Intelligent Wheelchair Controller is an innovative solution that transforms 
 - 2x Device to mount microcontrollers to the Wheelchair
 
 
-The Intelligent Wheelchair Controller is the perfect solution to enhance the accessibility and independence of wheelchair users. With easy installation and user-friendly operation, users can effectively control their computers without additional assistance.
+The Wheely-Joystick-Mouse is the perfect solution to enhance the accessibility and independence of wheelchair users. With easy installation and user-friendly operation, users can effectively control their computers without additional assistance.
