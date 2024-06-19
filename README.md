@@ -16,23 +16,12 @@ The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair
 
 3. Wireless Communication:
    - Bluetooth Connectivity: Both Puck.js microcontrollers communicate wirelessly via Bluetooth, ensuring a reliable and stable connection.
-   - Plug-and-Play: Simple setup with no additional drivers or software installation required.
-
-4. Highly Customizable:
-   - User-Defined Settings: Customizable software for specific requirements and preferences.
-   - Flexibility: Can be used with various wheelchair models and joystick types.
 
 # Technical Specifications:
 - Microcontroller: Puck.js with Bluetooth Low Energy (BLE) support.
 - Power Supply: Battery-powered (CR2032 coin cell) with long battery life.
 - Compatibility: Compatible with Windows, macOS, and Linux operating systems.
 - Range: Up to 10 meters wireless range.
-- Interfaces: Analog inputs for joystick connection and digital inputs for button.
-
-# Applications:
-- For People with Limited Mobility: Provides an intuitive and accessible way to control the computer.
-- Care Facilities and Rehabilitation Centers: Can be used in therapeutic and assisted environments.
-- Personal Use: Ideal for personal use at home or in the workplace.
 
 # Package Contents:
 - 2x Puck.js microcontrollers
