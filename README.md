@@ -2,7 +2,7 @@
 
 # Product Overview:
 The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair joystick into a PC mouse and includes an additional foot switch function for mouse clicks. This solution utilizes two Puck.js microcontrollers that communicate wirelessly via Bluetooth, ensuring seamless integration and easy operation.
-
+![WheelyJoystickMouse](WheelyJoystickMouse.png)
 
 
 # Key Features:
