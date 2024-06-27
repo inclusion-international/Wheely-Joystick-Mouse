@@ -37,3 +37,4 @@ The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair
 The Wheely-Joystick-Mouse is the perfect solution to enhance the accessibility and independence of wheelchair users. With easy installation and user-friendly operation, users can effectively control their computers without additional assistance.
 
 ## User Documentation:
+- ![WheelyJoystickMouse Präsentation] (WheelyJoystickMouse.pptx)
