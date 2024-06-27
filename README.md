@@ -38,5 +38,5 @@ The Wheely-Joystick-Mouse is the perfect solution to enhance the accessibility a
 
 ## User Documentation:
 - [WheelyJoystickMouse Präsentation](WheelyJoystickMouse.pptx)
-- [User Manual](UserManual.docx)
+- [User Manual](UserManual.pdf)
 - [CAD Files](CADFiles.zip)
