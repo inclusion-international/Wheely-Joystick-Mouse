@@ -30,6 +30,8 @@ The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair
 - 1x Super Glue
 - 1x Wire
 - 2x 3D printed Device to mount microcontrollers to the Wheelchair
+- 1x Screw
+- 1x Nut
 
 
 The Wheely-Joystick-Mouse is the perfect solution to enhance the accessibility and independence of wheelchair users. With easy installation and user-friendly operation, users can effectively control their computers without additional assistance.
