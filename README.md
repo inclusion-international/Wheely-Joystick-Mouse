@@ -1,9 +1,8 @@
 # Wheely-Joystick-Mouse
 
 # Product Overview:
-The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair joystick into a PC mouse and includes an additional foot switch function for mouse clicks. This solution utilizes two Puck.js microcontrollers that communicate wirelessly via Bluetooth, ensuring seamless integration and easy operation.
+The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair joystick into a PC mouse and includes an additional foot switch function for mouse clicks. This solution utilizes two Puck.js microcontrollers that communicate wirelessly with the PC or Smartphone via Bluetooth, ensuring seamless integration and easy operation.
 ![WheelyJoystickMouse](WheelyJoystickMouse.png)
-
 
 ## Key Features:
 
@@ -19,11 +18,23 @@ The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair
 3. Wireless Communication:
    - Bluetooth Connectivity: Both Puck.js microcontrollers communicate wirelessly via Bluetooth, ensuring a reliable and stable connection.
 
+## Web-UI
+
+1. Follow the instructions on the **[Web UI](src/index.html)** to flash the microcontroller. It will be configured with the default commands: ```Short press: left click```, ```Short, Short press: Double click```, ```Long press: Right click```.
+2. Click on the ```Connect``` button to change the configuration.
+3. Ensure to ```Disconnect``` before pairing your device on the operating system level.
+
 ## Technical Specifications:
 - Microcontroller: Puck.js with Bluetooth Low Energy (BLE) support.
 - Power Supply: Battery-powered (CR2032 coin cell) with long battery life.
 - Compatibility: Compatible with Windows, macOS, and Linux operating systems.
 - Range: Up to 10 meters wireless range.
+
+### Puck.js Microcontroller
+
+The puck-js is a small microcontroller that can be used as a wireless (Bluetooth) Assistive Button. The device can be programmed as an HID device emulating key strokes, mouse clicks or mouse movements (see also <a href="https://www.espruino.com/BLE+Keyboard">Tutorial Puck-js BLE HID Keyboard</a>).
+
+![Image of puck.js microcontroller with a button case](https://www.espruino.com/refimages/tutorials_Web_Bluetooth_thumb.png)
 
 ## Material:
 - 2x Puck.js microcontrollers
