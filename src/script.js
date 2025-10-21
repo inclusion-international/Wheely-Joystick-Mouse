@@ -102,7 +102,7 @@ async function sendATCommand(command, pressType) {
 
         if (!puckDevice || !puckDevice.gatt.connected) {
             console.warn("Device not connected.");
-            showError("Puck.js ist nicht verbunden! Bitte zuerst verbinden.");
+            showError("Puck.js is not connected! Please connect first.");
             return;
         }
         
