@@ -242,7 +242,7 @@ function updateKeyPressDegree(a) {
         LED1.set();
         keyToTap=HID.KEY.LEFT;
     }
-    console.log("keyToTap: "+keyToTap+"a.roll: "+a.roll+"a.pitch: "+a.pitch);
+    console.log("keyToTap: "+keyToTap+" a.roll: "+a.roll+" a.pitch: "+a.pitch);
     if(!sendHIDIntervalFunction && keyToTap) {
         console.log("Starting repeated key presses for key: "+keyToTap);
         // Initial key press
