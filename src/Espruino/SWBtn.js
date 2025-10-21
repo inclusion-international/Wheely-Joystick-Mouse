@@ -72,7 +72,7 @@ SWBtn - SoftWare Butten 'class'
   - f - storex passed or set dispatching callback function
   - b - storex button / pin id
   - d - stores disabled (status) of button
-  - t - xgofdx timeout for sequence end / pause detection
+  - t - stores timeout for sequence end / pause detection
   - k - stores build-up key store holding on to the "S"s and "L"s of a squence
   - w - stores hold on to the watch set with setWatch()
 */
