@@ -15,7 +15,7 @@ var eddystone = require("ble_eddystone");
 // SWButton.js is a custom javascript module and handles button press patterns (single, double, long press).
 // SWButton.js must be stored in the device's storage with the name 'SWButton' using the Espruino IDE.
 //var SWBtn = require("SWButton");
-var SWBtn = require("https://raw.githubusercontent.com/inclusion-international/Wheely-Joystick-Mouse/refs/heads/merge-deinhofer-puck-js-assistive/src/Espruino/SWBtn.js");
+var SWBtn=require("https://inclusion-international.github.io/Wheely-Joystick-Mouse/src/Espruino/SWBtn.js");
 
 // Default commands for button press patterns
 // S - single press: left click, SS - double press: double click, L - long press: right click
@@ -124,9 +124,6 @@ NRF.setAdvertising([
     // URL to configuration website
     [eddystone.get("https://l1nq.com/jtNjc")]
 ]);
-
-//lowering connection interval reduces bluetooth speed but also reduces power consumption from 665 to 50 (see E.getPowerUsage())
-NRF.setConnectionInterval(100);
 
 // Move mouse action with error handling
 function moveMouseAction(x, y, b) {
@@ -303,7 +300,7 @@ NRF.on('disconnect', function (reason) {
 
 //Start AHRS algorithm
 //var AHRS = require("AHRS");
-var AHRS = require("https://raw.githubusercontent.com/inclusion-international/Wheely-Joystick-Mouse/refs/heads/merge-deinhofer-puck-js-assistive/src/Espruino/AHRS.js");
+var AHRS=require("https://inclusion-international.github.io/Wheely-Joystick-Mouse/src/Espruino/AHRS.js");
 AHRS.init();
 
 // Listen for accelerometer data
@@ -317,5 +314,7 @@ interval = setInterval(function () {
     updateMouseMovementDegree(orientation);
 }, 50);
 
+//lowering connection interval reduces bluetooth speed but also reduces power consumption from 665 to 50 (see E.getPowerUsage())
+NRF.setConnectionInterval(100);
 digitalPulse(LED3, 1, 500);
 console.log("Puck.js is ready.");
