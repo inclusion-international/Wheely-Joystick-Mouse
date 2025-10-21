@@ -206,28 +206,6 @@ function executeNextCommand(mode) {
 }
 
 
-function doTiltAction(tiltState, tiltValue, x, y) {
-    switch (tiltState) {
-        case "UP":
-            // Handle tilt up
-            moveMouseAction(x,y, 0);
-            break;
-        case "DOWN":
-            // Handle tilt down
-            moveMouseAction(x,y, 0);
-            break;
-        case "LEFT":
-            // Handle tilt left
-            moveMouseAction(x,y, 0);
-            break;
-        case "RIGHT":
-            // Handle tilt right
-            moveMouseAction(x,y, 0);
-            break;
-        default:
-            console.log("Unknown tilt state:", tiltState);
-    }
-}
 
 
 // Instantiate SWButton object and initialize it with callback for press patterns
