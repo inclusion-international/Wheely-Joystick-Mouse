@@ -350,10 +350,8 @@ function startCheckTiltInterval(checkFunction, checkInterval) {
 function stopCheckTiltInterval() {
   if(checkTiltIntervalFunction) {
     console.log("Stopping checkTiltIntervalFunction");
-    if(checkTiltIntervalFunction) {
-      clearInterval(checkTiltIntervalFunction);
-      checkTiltIntervalFunction = undefined;
-    }
+    clearInterval(checkTiltIntervalFunction);
+    checkTiltIntervalFunction = undefined;
   }
 }
 
