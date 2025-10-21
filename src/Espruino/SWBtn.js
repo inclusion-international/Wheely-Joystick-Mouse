@@ -59,7 +59,7 @@ var mySWBtn = new SWBtn(function(k){
 */
 
 /**
-SWBtn - SoftWare Butten 'class'
+SWBtn - SoftWare Button 'class'
 - constructor - accepts these arguments:
   - f - (optional) anonymous, one argument accepting dispatching callback function
   - b - (optional) button/pin id - default is BTN1
