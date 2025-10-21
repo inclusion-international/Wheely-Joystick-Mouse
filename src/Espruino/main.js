@@ -321,7 +321,7 @@ NRF.on('disconnect', function (reason) {
     digitalPulse(LED2, 1, 500);    
     Puck.accelOff();
     // Stop checking tilt level for mouse movement or keyboard input
-    stopCheckTiltInterval()
+    stopCheckTiltInterval();
 });
 
 //Start AHRS algorithm
