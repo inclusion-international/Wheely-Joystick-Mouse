@@ -206,41 +206,6 @@ var myButton = new SWBtn(function (k) {
 // Initial load of stored commands and integrity check setup
 loadStoredCommands();
 
-// Function to handle accelerometer (tilt) events
-function updateMouseMovement(a) {
-    let x = 0, y = 0;
-    const sensitivity = 1500; // Adjust sensitivity as needed (lower value = higher sensitivity)
-    const speed = 10; // Adjust speed for faster movement
-
-    console.log("x=" + a.acc.x);
-    console.log("y=" + a.acc.y);
-
-    // Use accelerometer data to control mouse movement
-    if (a.acc.y > sensitivity) {
-        LED2.set();
-        y = speed;
-    }
-    else if (a.acc.y < -sensitivity) {
-        LED2.set();
-        y = -speed;
-    }
-    if (a.acc.x > sensitivity) {
-        LED1.set();
-        x = -speed;
-    }
-    else if (a.acc.x < -sensitivity) {
-        LED1.set();
-        x = speed;
-    }
-    if (x != 0 || y != 0) {
-        moveMouseAction(x, y, 0);
-    }
-
-    LED1.reset();
-    LED2.reset();
-    LED3.reset();
-}
-
 function updateMouseMovementDegree(a) {
     let x = 0, y = 0;
     const sensitivity = 30; // Adjust sensitivity as needed (lower value = higher sensitivity)
