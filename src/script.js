@@ -58,7 +58,7 @@ async function connectToPuck() {
 async function disconnectFromPuck() {
     if (!puckDevice || !puckDevice.gatt) {  // Check if puckDevice exists
         console.warn("No device to disconnect.");
-        showError("Kein Gerät verbunden!");
+        showError("No device connected!");
         return;
     }
 
