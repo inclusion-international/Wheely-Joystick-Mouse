@@ -18,7 +18,7 @@ window.hideError = function() {
     errorBox.style.display = "none";
 }
 
-const PUCK_BLE_CHARACTERISTIC = 0xBCDE;
+const PUCK_AT_COMMAND_SERVICE = 0xBCDE;
 const PUCK_AT_COMMAND_WRITE_CHARACTERISTIC = 0xABCD;
 // Connect to Puck.js
 async function connectToPuck() {
