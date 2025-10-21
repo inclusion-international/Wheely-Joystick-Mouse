@@ -73,7 +73,7 @@ SWBtn - SoftWare Button 'class'
   - b - storex button / pin id
   - d - stores disabled (status) of button
   - t - stores timeout for sequence end / pause detection
-  - k - stores build-up key store holding on to the "S"s and "L"s of a squence
+  - k - stores build-up key store holding on to the "S"s and "L"s of a sequence
   - w - stores hold on to the watch set with setWatch()
 */
 var SWBtn = function(f,b,d) {
