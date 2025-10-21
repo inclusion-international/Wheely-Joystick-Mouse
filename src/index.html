@@ -1,0 +1,61 @@
+<!-- 
+ Demo Web-UI to configure puck.js
+ Code based on bachelor project of Yuqing and modified by Deinhofer
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Puck.js HID Configuration</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <h1>Puck.js firmware initialization</h1>
+    <p>Before the Puck.js can be used, it needs to be initialized with the appropriate firmware.</p>
+    <p>Please follow these steps:</p>
+    <ol>
+        <li>Open the <a href="https://www.espruino.com/ide/" target="_blank">Espruino Web IDE</a> in your browser.</li>
+        <li>Connect your Puck.js to your computer via Bluetooth (Top-left button).</li>
+        <li>Load the <a href="./Espruino/main.js" target="_blank">firmware file main.js</a> into the Espruino Web IDE.</li>
+        <li>Click the "Send to Espruino (Flash)" button in the IDE to upload the firmware to your Puck.js.</li>
+    </ol>
+    <h1>Puck.js HID Configuration</h1>
+
+    <!-- Connection Buttons -->
+    <button id="connect">Connect to Puck.js</button>
+    <button id="disconnect" disabled>Disconnect</button>
+    <p id="status">Status: Not Connected</p>
+
+    <!-- Error Message Display -->
+    <div id="error-message" style="display: none; color: red; font-weight: bold; margin-top: 10px;"></div>
+
+    <!-- Three-column layout -->
+    <div class="action-container">
+        <!-- Short Press (S) -->
+        <div class="action-column">
+            <h2>Short Press (S)</h2>
+            <select id="actionSelectS" class="actionSelect"></select>
+            <button class="sendAction" data-type="S">Send Action</button>
+        </div>
+
+        <!-- Double Press (SS) -->
+        <div class="action-column">
+            <h2>Double Press (SS)</h2>
+            <select id="actionSelectSS" class="actionSelect"></select>
+            <button class="sendAction" data-type="SS">Send Action</button>
+        </div>
+
+        <!-- Long Press (L) -->
+        <div class="action-column">
+            <h2>Long Press (L)</h2>
+            <select id="actionSelectL" class="actionSelect"></select>
+            <button class="sendAction" data-type="L">Send Action</button>
+        </div>
+    </div>
+
+    <p id="log"></p>
+</body>
+</html>

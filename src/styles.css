@@ -1,0 +1,90 @@
+body {
+    font-family: Arial, sans-serif;
+    padding: 20px;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+button {
+    margin: 10px;
+    padding: 10px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+select {
+    margin: 5px;
+    padding: 5px;
+    font-size: 16px;
+}
+
+#status {
+    font-weight: bold;
+    color: red;
+}
+
+.connected {
+    color: green;
+}
+
+#log {
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+/* Add error message styles */
+#error-message {
+    display: none;
+    color: red;
+    font-weight: bold;
+    background-color: #ffdddd;
+    border: 1px solid red;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+.action-container {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.action-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.action-column {
+    flex: 1;
+    max-width: 1000px;
+    padding: 15px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+}
+
+h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+.wide {
+    width: 100%; /* Expanded width for Short Press */
+}
+
+.s-action {
+    color: blue;
+}
+
+.ss-action {
+    color: orange;
+}
+
+.l-action {
+    color: red;
+}
