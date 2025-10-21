@@ -14,7 +14,8 @@ var eddystone = require("ble_eddystone");
 
 // SWButton.js is a custom javascript module and handles button press patterns (single, double, long press).
 // SWButton.js must be stored in the device's storage with the name 'SWButton' using the Espruino IDE.
-var SWBtn = require("SWButton");
+//var SWBtn = require("SWButton");
+var SWBtn = require("https://raw.githubusercontent.com/inclusion-international/Wheely-Joystick-Mouse/refs/heads/merge-deinhofer-puck-js-assistive/src/Espruino/SWBtn.js");
 
 // Default commands for button press patterns
 // S - single press: left click, SS - double press: double click, L - long press: right click
@@ -301,7 +302,8 @@ NRF.on('disconnect', function (reason) {
 });
 
 //Start AHRS algorithm
-var AHRS = require("AHRS");
+//var AHRS = require("AHRS");
+var AHRS = require("https://raw.githubusercontent.com/inclusion-international/Wheely-Joystick-Mouse/refs/heads/merge-deinhofer-puck-js-assistive/src/Espruino/AHRS.js");
 AHRS.init();
 
 // Listen for accelerometer data
