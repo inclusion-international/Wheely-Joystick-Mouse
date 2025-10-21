@@ -24,6 +24,7 @@ var AHRS = (function () {
     // Initialisierung
     function init() {
         // Turn on accelerometer
+        console.log("Initializing AHRS...");
         Puck.accelOn(sampleRate);
 
         // Sensor data subscription
@@ -65,6 +66,7 @@ var AHRS = (function () {
             pitch += gyro.y * dt;
             yaw += gyro.z * dt;
         }
+        //console.log("Roll:", roll, "Pitch:", pitch, "Yaw:", yaw);
     }
 
     // Return Current orientation (in Radians)
