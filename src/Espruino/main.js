@@ -142,6 +142,15 @@ function clickButtonAction(b) {
     }
 }
 
+function tapKeyAction(k) {
+    try {
+        console.log("Sending key: "+k);
+        HID.tapKey(k);
+    } catch (err) {
+        console.log("Cannot send key tap, connected as HID device? Reason: " + err.message);
+    }
+}
+
 // Execute the command associated with the button press pattern
 function executeNextCommand(mode) {
     var command = storeCommands[mode];
@@ -165,7 +174,7 @@ function executeNextCommand(mode) {
                 }
 
                 try {
-                    HID.tapKey(HID.KEY[key]);
+                    tapKeyAction(HID.KEY[key]);
                     console.log("Key pressed:", key);
                 } catch (e) {
                     console.log("Error pressing key:", e);
@@ -197,6 +206,30 @@ function executeNextCommand(mode) {
 }
 
 
+function doTiltAction(tiltState, tiltValue, x, y) {
+    switch (tiltState) {
+        case "UP":
+            // Handle tilt up
+            moveMouseAction(x,y, 0);
+            break;
+        case "DOWN":
+            // Handle tilt down
+            moveMouseAction(x,y, 0);
+            break;
+        case "LEFT":
+            // Handle tilt left
+            moveMouseAction(x,y, 0);
+            break;
+        case "RIGHT":
+            // Handle tilt right
+            moveMouseAction(x,y, 0);
+            break;
+        default:
+            console.log("Unknown tilt state:", tiltState);
+    }
+}
+
+
 // Instantiate SWButton object and initialize it with callback for press patterns
 var myButton = new SWBtn(function (k) {
     console.log("Button press pattern detected:", k);
@@ -206,6 +239,51 @@ var myButton = new SWBtn(function (k) {
 // Initial load of stored commands and integrity check setup
 loadStoredCommands();
 
+//if undefined no HID reports are sent repeatedly
+//if defined HID reports are sent repeatedly every interval
+var sendHIDIntervalFunction;
+const mouseMoveInterval = 50; //milliseconds
+const keyboardSendInterval = 1000; //milliseconds
+const checkTiltInterval = 100; //milliseconds
+
+// Update key presses based on tilt level
+function updateKeyPressDegree(a) {
+    const sensitivity = 30; // Adjust sensitivity as needed (lower value = higher sensitivity)
+    // Use tilt level to control key presses
+    var keyToTap;
+    if (a.roll > sensitivity) {
+        LED2.set();
+        keyToTap=HID.KEY.DOWN;
+    } else if (a.roll < -sensitivity) {
+        LED2.set();
+        keyToTap=HID.KEY.UP;
+    } else if (a.pitch > sensitivity) {
+        LED1.set();
+        keyToTap=HID.KEY.RIGHT;
+    } else if (a.pitch < -sensitivity) {
+        LED1.set();
+        keyToTap=HID.KEY.LEFT;
+    }
+    console.log("keyToTap: "+keyToTap+"a.roll: "+a.roll+"a.pitch: "+a.pitch);
+    if(!sendHIDIntervalFunction && keyToTap) {
+        console.log("Starting repeated key presses for key: "+keyToTap);
+        // Initial key press
+        tapKeyAction(keyToTap);
+        // Repeated key presses
+        sendHIDIntervalFunction = setInterval(() => tapKeyAction(keyToTap), keyboardSendInterval);
+    } else if(!keyToTap) {
+        // No significant tilt, stop repeated key presses
+        console.log("Stopping repeated key presses");
+        if(sendHIDIntervalFunction) {
+            clearInterval(sendHIDIntervalFunction);
+        }
+        sendHIDIntervalFunction = undefined;
+    }
+    LED1.reset();
+    LED2.reset();
+}
+
+// Update mouse movement based on tilt degree
 function updateMouseMovementDegree(a) {
     let x = 0, y = 0;
     const sensitivity = 30; // Adjust sensitivity as needed (lower value = higher sensitivity)
@@ -217,7 +295,7 @@ function updateMouseMovementDegree(a) {
     speed_roll = speed_roll > max_speed ? max_speed : speed_roll;
     speed_pitch = speed_pitch > max_speed ? max_speed : speed_pitch;
 
-    // Use accelerometer data to control mouse movement
+    // Use tilt level to determine mouse speed and direction
     if (a.roll > sensitivity) {
         LED2.set();
         y = speed_roll;
@@ -243,7 +321,6 @@ function updateMouseMovementDegree(a) {
     LED3.reset();
 }
 
-
 // Handle BLE connection events
 NRF.on('connect', function (addr) {
     console.log("Connected to:", addr);
@@ -253,14 +330,20 @@ NRF.on('connect', function (addr) {
     // Enable accelerometer with default frequency only when connected
     digitalPulse(LED1, 1, 500);
     AHRS.init();
+    
+    // Start checking tilt for mouse movement or keyboard input depending on tilt level
+    //startCheckTiltInterval(updateKeyPressDegree, checkTiltInterval);
+    startCheckTiltInterval(updateMouseMovementDegree, mouseMoveInterval);
 });
 
 // Handle BLE disconnection events
 NRF.on('disconnect', function (reason) {
     console.log("Disconnected, reason:", reason);
     // Turn off accelerometer to save power when not connected
-    digitalPulse(LED2, 1, 500);
+    digitalPulse(LED2, 1, 500);    
     Puck.accelOff();
+    // Stop checking tilt level for mouse movement or keyboard input
+    stopCheckTiltInterval()
 });
 
 //Start AHRS algorithm
@@ -268,16 +351,33 @@ NRF.on('disconnect', function (reason) {
 var AHRS=require("https://inclusion-international.github.io/Wheely-Joystick-Mouse/src/Espruino/AHRS.js");
 AHRS.init();
 
-// Listen for accelerometer data
-interval = setInterval(function () {
-    var orientation = AHRS.getOrientationDegree();
-    console.log(
-        "Roll:", orientation.roll.toFixed(2),
-        "Pitch:", orientation.pitch.toFixed(2),
-        "Yaw:", orientation.yaw.toFixed(2)
-    );
-    updateMouseMovementDegree(orientation);
-}, 50);
+// Interval function to check tilt and call provided function
+var checkTiltIntervalFunction;
+// Starts an interval to check tilt and call the provided function
+function startCheckTiltInterval(checkFunction, checkInterval) {
+    if(!checkTiltIntervalFunction) {
+        console.log("Starting checkTiltIntervalFunction");
+        checkTiltIntervalFunction = setInterval(() => {
+            var orientation = AHRS.getOrientationDegree();
+            console.log(
+                "Roll:", orientation.roll.toFixed(2),
+                "Pitch:", orientation.pitch.toFixed(2),
+                "Yaw:", orientation.yaw.toFixed(2)
+            );
+            checkFunction(orientation);
+        }, checkInterval);
+    }
+}
+// Stops the tilt checking interval
+function stopCheckTiltInterval() {
+  if(checkTiltIntervalFunction) {
+    console.log("Stopping checkTiltIntervalFunction");
+    if(checkTiltIntervalFunction) {
+      clearInterval(checkTiltIntervalFunction);
+      checkTiltIntervalFunction = undefined;
+    }
+  }
+}
 
 //lowering connection interval reduces bluetooth speed but also reduces power consumption from 665 to 50 (see E.getPowerUsage())
 NRF.setConnectionInterval(100);
