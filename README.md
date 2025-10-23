@@ -1,6 +1,6 @@
 # Wheely-Joystick-Mouse
 
-# Product Overview:
+# Product Overview
 The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair joystick into a PC mouse and includes an additional foot switch function for mouse clicks. This solution utilizes two Puck.js microcontrollers that communicate wirelessly with the PC or Smartphone via Bluetooth, ensuring seamless integration and easy operation.
 ![WheelyJoystickMouse](WheelyJoystickMouse.png)
 
@@ -20,7 +20,7 @@ The Wheely-Joystick-Mouse is an innovative solution that transforms a wheelchair
 
 ## Web-UI
 
-1. Follow the instructions on the **[Web UI](src/index.html)** to flash the microcontroller. It will be configured with the default commands: ```Short press: left click```, ```Short, Short press: Double click```, ```Long press: Right click```.
+1. Follow the instructions on the **[Web UI](https://inclusion-international.github.io/Wheely-Joystick-Mouse/src/index.html)** to flash the microcontroller. It will be configured with the default commands: ```Short press: left click```, ```Short, Short press: Double click```, ```Long press: Right click```.
 2. Click on the ```Connect``` button to change the configuration.
 3. Ensure to ```Disconnect``` before pairing your device on the operating system level.
 
