@@ -5,6 +5,8 @@
 // Commands can be configured via a custom BLE service.
 // Supported commands include key presses and mouse actions.
 
+const DEBUG=0; //enable to see console.log messages
+
 // Load necessary modules
 // ble_hid_combo provides combined keyboard and mouse HID functionality
 var HID = require("ble_hid_combo");
@@ -130,7 +132,7 @@ function moveMouseAction(x, y, b) {
     try {
         HID.moveMouse(x, y, b);
     } catch (err) {
-        console.log("Cannot send mouse function, connected as HID device? Reason: " + err.message);
+        if(DEBUG==1) console.log("Cannot send mouse function, connected as HID device? Reason: " + err.message);
     }
 }
 
@@ -138,16 +140,16 @@ function clickButtonAction(b) {
     try {
         HID.clickButton(b);
     } catch (err) {
-        console.log("Cannot send mouse click, connected as HID device? Reason: " + err.message);
+        if(DEBUG==1) console.log("Cannot send mouse click, connected as HID device? Reason: " + err.message);
     }
 }
 
 function tapKeyAction(k) {
     try {
-        console.log("Sending key: "+k);
+        if(DEBUG==1) console.log("Sending key: "+k);
         HID.tapKey(k);
     } catch (err) {
-        console.log("Cannot send key tap, connected as HID device? Reason: " + err.message);
+        if(DEBUG==1) console.log("Cannot send key tap, connected as HID device? Reason: " + err.message);
     }
 }
 
@@ -156,11 +158,11 @@ function executeNextCommand(mode) {
     var command = storeCommands[mode];
 
     if (!command || typeof command !== "string") {
-        console.log("Invalid command format:", JSON.stringify(command));
+        if(DEBUG==1) console.log("Invalid command format:", JSON.stringify(command));
         return;
     }
 
-    console.log("Executing command:", command);
+    if(DEBUG==1) console.log("Executing command:", command);
 
     let parts = command.split(" ");
     if (parts[0] === "AT") {
@@ -169,15 +171,15 @@ function executeNextCommand(mode) {
                 let key = parts.slice(2).join(" ").toUpperCase();
 
                 if (!HID.KEY[key]) {
-                    console.log("Unknown key:", key);
+                    if(DEBUG==1) console.log("Unknown key:", key);
                     return;
                 }
 
                 try {
                     tapKeyAction(HID.KEY[key]);
-                    console.log("Key pressed:", key);
+                    if(DEBUG==1) console.log("Key pressed:", key);
                 } catch (e) {
-                    console.log("Error pressing key:", e);
+                    if(DEBUG==1) console.log("Error pressing key:", e);
                 }
             } else if (parts[1] === "CL") {
                 clickButtonAction(HID.BUTTON.LEFT);
@@ -195,13 +197,13 @@ function executeNextCommand(mode) {
             } else if (parts[1] === "DRAG") {
                 moveMouseAction(10, 10, 0);
             } else {
-                console.log("Unknown AT command:", command);
+                if(DEBUG==1) console.log("Unknown AT command:", command);
             }
         } catch (err) {
-            console.log("Cannot send HID function, connected as HID device? Reason: " + err.message);
+            if(DEBUG==1) console.log("Cannot send HID function, connected as HID device? Reason: " + err.message);
         }
     } else {
-        console.log("Invalid command format:", command);
+        if(DEBUG==1) console.log("Invalid command format:", command);
     }
 }
 
@@ -210,7 +212,7 @@ function executeNextCommand(mode) {
 
 // Instantiate SWButton object and initialize it with callback for press patterns
 var myButton = new SWBtn(function (k) {
-    console.log("Button press pattern detected:", k);
+    if(DEBUG==1) console.log("Button press pattern detected:", k);
     executeNextCommand(k);
 });
 
@@ -242,16 +244,16 @@ function updateKeyPressDegree(a) {
         LED1.set();
         keyToTap=HID.KEY.LEFT;
     }
-    console.log("keyToTap: "+keyToTap+" a.roll: "+a.roll+" a.pitch: "+a.pitch);
+    if(DEBUG==1) console.log("keyToTap: "+keyToTap+" a.roll: "+a.roll+" a.pitch: "+a.pitch);
     if(!sendHIDIntervalFunction && keyToTap) {
-        console.log("Starting repeated key presses for key: "+keyToTap);
+        if(DEBUG==1) console.log("Starting repeated key presses for key: "+keyToTap);
         // Initial key press
         tapKeyAction(keyToTap);
         // Repeated key presses
         sendHIDIntervalFunction = setInterval(() => tapKeyAction(keyToTap), keyboardSendInterval);
     } else if(!keyToTap) {
         // No significant tilt, stop repeated key presses
-        console.log("Stopping repeated key presses");
+        if(DEBUG==1) console.log("Stopping repeated key presses");
         if(sendHIDIntervalFunction) {
             clearInterval(sendHIDIntervalFunction);
         }
@@ -337,11 +339,9 @@ function startCheckTiltInterval(checkFunction, checkInterval) {
         console.log("Starting checkTiltIntervalFunction");
         checkTiltIntervalFunction = setInterval(() => {
             var orientation = AHRS.getOrientationDegree();
-            console.log(
-                "Roll:", orientation.roll.toFixed(2),
-                "Pitch:", orientation.pitch.toFixed(2),
-                "Yaw:", orientation.yaw.toFixed(2)
-            );
+            if(DEBUG==1) {
+                console.log("Roll:", orientation.roll.toFixed(2),"Pitch:", orientation.pitch.toFixed(2),"Yaw:", orientation.yaw.toFixed(2));
+            }   
             checkFunction(orientation);
         }, checkInterval);
     }
