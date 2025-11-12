@@ -132,14 +132,16 @@ function moveMouseAction(x, y, b) {
     try {
         HID.moveMouse(x, y, b);
     } catch (err) {
+        digitalPulse(LED1, 1, 300);
         if(DEBUG==1) console.log("Cannot send mouse function, connected as HID device? Reason: " + err.message);
-    }
+      }
 }
 
 function clickButtonAction(b) {
     try {
         HID.clickButton(b);
     } catch (err) {
+        digitalPulse(LED1, 1, 300);
         if(DEBUG==1) console.log("Cannot send mouse click, connected as HID device? Reason: " + err.message);
     }
 }
@@ -149,6 +151,7 @@ function tapKeyAction(k) {
         if(DEBUG==1) console.log("Sending key: "+k);
         HID.tapKey(k);
     } catch (err) {
+        digitalPulse(LED1, 1, 300);
         if(DEBUG==1) console.log("Cannot send key tap, connected as HID device? Reason: " + err.message);
     }
 }
@@ -238,10 +241,10 @@ function updateKeyPressDegree(a) {
         LED2.set();
         keyToTap=HID.KEY.UP;
     } else if (a.pitch > sensitivity) {
-        LED1.set();
+        LED3.set();
         keyToTap=HID.KEY.RIGHT;
     } else if (a.pitch < -sensitivity) {
-        LED1.set();
+        LED3.set();
         keyToTap=HID.KEY.LEFT;
     }
     if(DEBUG==1) console.log("keyToTap: "+keyToTap+" a.roll: "+a.roll+" a.pitch: "+a.pitch);
@@ -259,8 +262,8 @@ function updateKeyPressDegree(a) {
         }
         sendHIDIntervalFunction = undefined;
     }
-    LED1.reset();
     LED2.reset();
+    LED3.reset();
 }
 
 // Update mouse movement based on tilt degree
@@ -285,18 +288,17 @@ function updateMouseMovementDegree(a) {
         y = -speed_roll;
     }
     if (a.pitch > sensitivity) {
-        LED1.set();
+        LED3.set();
         x = speed_pitch;
     }
     else if (a.pitch < -sensitivity) {
-        LED1.set();
+        LED3.set();
         x = -speed_pitch;
     }
     if (x != 0 || y != 0) {
         moveMouseAction(x, y, 0);
     }
 
-    LED1.reset();
     LED2.reset();
     LED3.reset();
 }
@@ -308,7 +310,7 @@ NRF.on('connect', function (addr) {
     NRF.setSecurity({ mitm: false, display: false, keyboard: false });
 
     // Enable accelerometer with default frequency only when connected
-    digitalPulse(LED1, 1, 500);
+    digitalPulse(LED2, 1, 500);
     AHRS.init();
     
     // Start checking tilt for mouse movement or keyboard input depending on tilt level
@@ -320,7 +322,7 @@ NRF.on('connect', function (addr) {
 NRF.on('disconnect', function (reason) {
     console.log("Disconnected, reason:", reason);
     // Turn off accelerometer to save power when not connected
-    digitalPulse(LED2, 1, 500);    
+    digitalPulse(LED3, 1, 500);    
     Puck.accelOff();
     // Stop checking tilt level for mouse movement or keyboard input
     stopCheckTiltInterval();
