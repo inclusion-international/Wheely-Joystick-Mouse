@@ -114,6 +114,12 @@ NRF.setServices({
         readable: true,
         notify: true,
         onRead: function (evt) {
+          NRF.updateServices({
+            0xBCDE : {
+              0xABCE : {
+                value : "Puck AT RX Service"
+              }
+            }});
           return "Assistive Puck Device";
         }
       }
