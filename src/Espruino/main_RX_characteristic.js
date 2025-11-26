@@ -70,7 +70,7 @@ var receivedCmd = "";
 NRF.setServices({
     0xBCDE: {
         0xABCD: {
-            value: "test message",
+            value: "",
             writable: true,
             onWrite: function (evt) {
                 receivedCmd = "";
@@ -83,7 +83,14 @@ NRF.setServices({
                     console.log("Empty command received, ignoring.");
                     return;
                 }
-                console.log("RCV cmd: "+receiveCmd);
+                console.log("RCV cmd: "+receivedCmd);
+                NRF.updateServices({
+                  0xBCDE : {
+                    0xABCE : {
+                      value : receivedCmd,
+                      notify: true
+                    }
+                }});
 
                 // Basic validation of command format
                 if (!receivedCmd.includes(":")) {
@@ -109,18 +116,18 @@ NRF.setServices({
                 }
             }
         },
-      0xABCE: {
+        0xABCE: {
         value: "Read message",
         readable: true,
         notify: true,
         onRead: function (evt) {
-          NRF.updateServices({
+            NRF.updateServices({
             0xBCDE : {
-              0xABCE : {
+                0xABCE : {
                 value : "Puck AT RX Service"
-              }
+                }
             }});
-          return "Assistive Puck Device";
+            return "Assistive Puck Device";
         }
       }
     }

@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>BLE TX/RX Example - Puck.js</title>
+    <style>
+        body { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin: 18px; }
+        button { margin: 4px; }
+        #status.connected { color: green; }
+        #status.disconnected { color: darkred; }
+        pre { background:#f4f4f4; padding:10px; border-radius:6px; max-height:240px; overflow:auto; }
+        .row { display:flex; gap:8px; align-items:center; margin-bottom:8px }
+        label { min-width:80px }
+    </style>
+</head>
+<body>
+    <h1>Puck.js BLE Example (TX write / RX notify)</h1>
+
+    <div class="row">
+        <button id="connect">Connect</button>
+        <button id="disconnect" disabled>Disconnect</button>
+        <span id="status" class="disconnected">Status: Disconnected</span>
+    </div>
+
+    <div class="row">
+        <label for="command">Command</label>
+        <input id="command" type="text" placeholder="AT KP A" style="flex:1" />
+        <button id="send" disabled>Send (TX)</button>
+    </div>
+
+    <h3>Received (RX)</h3>
+    <pre id="rxLog"></pre>
+
+    <script>
+    // Service / characteristic UUIDs (as requested)
+    const PUCK_AT_COMMAND_SERVICE = 0xBCDE;
+    const PUCK_AT_COMMAND_WRITE_CHARACTERISTIC = 0xABCD; // TX from browser -> device
+    const PUCK_AT_COMMAND_READ_CHARACTERISTIC = 0xABCE;  // RX notifications device -> browser
+
+    let device = null;
+    let server = null;
+    let txCharacteristic = null; // write
+    let rxCharacteristic = null; // notify
+
+    const connectBtn = document.getElementById('connect');
+    const disconnectBtn = document.getElementById('disconnect');
+    const sendBtn = document.getElementById('send');
+    const commandInput = document.getElementById('command');
+    const statusSpan = document.getElementById('status');
+    const rxLog = document.getElementById('rxLog');
+
+    function logRx(text) {
+        rxLog.textContent += text + "\n";
+        rxLog.scrollTop = rxLog.scrollHeight;
+    }
+
+    function setStatus(connected) {
+        if (connected) {
+            statusSpan.textContent = 'Status: Connected';
+            statusSpan.classList.remove('disconnected');
+            statusSpan.classList.add('connected');
+        } else {
+            statusSpan.textContent = 'Status: Disconnected';
+            statusSpan.classList.remove('connected');
+            statusSpan.classList.add('disconnected');
+        }
+    }
+
+    async function connect() {
+        try {
+            console.log('Requesting Bluetooth device...');
+            device = await navigator.bluetooth.requestDevice({
+                acceptAllDevices: true,
+                optionalServices: [PUCK_AT_COMMAND_SERVICE]
+            });
+
+            device.addEventListener('gattserverdisconnected', onDisconnected);
+
+            console.log('Connecting to GATT server...');
+            server = await device.gatt.connect();
+
+            const service = await server.getPrimaryService(PUCK_AT_COMMAND_SERVICE);
+
+            // Get TX (write) and RX (notify) characteristics
+            txCharacteristic = await service.getCharacteristic(PUCK_AT_COMMAND_WRITE_CHARACTERISTIC);
+            rxCharacteristic = await service.getCharacteristic(PUCK_AT_COMMAND_READ_CHARACTERISTIC);
+
+            if (!txCharacteristic || !rxCharacteristic) {
+                throw new Error('Required characteristics not found');
+            }
+
+            // Start notifications on RX
+            await rxCharacteristic.startNotifications();
+            rxCharacteristic.addEventListener('characteristicvaluechanged', handleNotification);
+
+            setStatus(true);
+            disconnectBtn.disabled = false;
+            connectBtn.disabled = true;
+            sendBtn.disabled = false;
+            console.log('Connected and notifications started');
+
+        } catch (err) {
+            console.error('Connection failed:', err);
+            alert('Connection failed: ' + (err && err.message ? err.message : err));
+            cleanup();
+        }
+    }
+
+    async function disconnect() {
+        if (!device) return;
+        try {
+            if (rxCharacteristic) {
+                try {
+                    await rxCharacteristic.stopNotifications();
+                } catch (e) {
+                    // ignore if not supported
+                    console.debug('stopNotifications error', e);
+                }
+                rxCharacteristic.removeEventListener('characteristicvaluechanged', handleNotification);
+                rxCharacteristic = null;
+            }
+
+            if (device.gatt && device.gatt.connected) {
+                device.gatt.disconnect();
+            }
+        } catch (err) {
+            console.warn('Error during disconnect', err);
+        }
+        cleanup();
+        setStatus(false);
+        connectBtn.disabled = false;
+        disconnectBtn.disabled = true;
+        sendBtn.disabled = true;
+    }
+
+    function onDisconnected() {
+        console.warn('Device disconnected');
+        cleanup();
+        setStatus(false);
+        connectBtn.disabled = false;
+        disconnectBtn.disabled = true;
+        sendBtn.disabled = true;
+    }
+
+    function cleanup() {
+        server = null;
+        txCharacteristic = null;
+        rxCharacteristic = null;
+        device = null;
+    }
+
+    function handleNotification(event) {
+        // event.target.value is a DataView
+        const dataView = event.target.value;
+        // create a Uint8Array view of the received bytes (respecting offset & length)
+        const bytes = new Uint8Array(dataView.buffer, dataView.byteOffset, dataView.byteLength);
+        const text = new TextDecoder().decode(bytes);
+        console.log('Notification received:', text);
+        logRx(text);
+    }
+
+    async function sendCommand() {
+        if (!txCharacteristic) {
+            alert('Not connected or TX characteristic missing');
+            return;
+        }
+        const cmd = commandInput.value || '';
+        const encoder = new TextEncoder();
+        // Append newline to align with many AT-style command parsers
+        const payload = encoder.encode(cmd + '\n');
+        try {
+            await txCharacteristic.writeValue(payload);
+            console.log('Sent:', cmd);
+        } catch (err) {
+            console.error('Write failed:', err);
+            alert('Write failed: ' + (err && err.message ? err.message : err));
+        }
+    }
+
+    connectBtn.addEventListener('click', connect);
+    disconnectBtn.addEventListener('click', disconnect);
+    sendBtn.addEventListener('click', sendCommand);
+
+    // Helper: allow Enter to send
+    commandInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendCommand();
+        }
+    });
+
+    </script>
+</body>
+</html>
