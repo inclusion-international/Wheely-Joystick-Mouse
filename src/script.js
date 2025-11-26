@@ -20,6 +20,7 @@ window.hideError = function() {
 
 const PUCK_AT_COMMAND_SERVICE = 0xBCDE;
 const PUCK_AT_COMMAND_WRITE_CHARACTERISTIC = 0xABCD;
+const PUCK_AT_COMMAND_READ_CHARACTERISTIC = 0xABCE;
 // Connect to Puck.js
 async function connectToPuck() {
     try {
@@ -40,7 +41,21 @@ async function connectToPuck() {
 
         const service = await gattServer.getPrimaryService(PUCK_AT_COMMAND_SERVICE);
         characteristic = await service.getCharacteristic(PUCK_AT_COMMAND_WRITE_CHARACTERISTIC);
+        rxCharacteristic = await service.getCharacteristic(PUCK_AT_COMMAND_READ_CHARACTERISTIC); // RX Characteristic UUID
+        if (!characteristic || !rxCharacteristic) {
+            throw new Error("Required characteristics not found");
+        }
+        await rxCharacteristic.startNotifications();
 
+        rxCharacteristic.addEventListener('characteristicvaluechanged', function(event) {
+          var dataview = event.target.value;
+            var receivedString = new TextDecoder().decode(dataview);
+            console.log("Received data from Puck.js:", receivedString);
+            const dataLog = document.getElementById("data-log");
+            if (dataLog) {
+                dataLog.textContent += receivedString + "\n";
+            }
+        });
         document.getElementById("status").textContent = "Status: Connected";
         document.getElementById("status").classList.add("connected");
         document.getElementById("disconnect").disabled = false;
