@@ -165,11 +165,13 @@
             alert('Not connected or TX characteristic missing');
             return;
         }
-        const cmd = commandInput.value || '';
+        let cmd = commandInput.value || '';
+        cmd = cmd.trim();
         const encoder = new TextEncoder();
         // Append newline to align with many AT-style command parsers
         const payload = encoder.encode(cmd + '\n');
         try {
+            console.log('Sending bytes.length:', payload.length);
             await txCharacteristic.writeValue(payload);
             console.log('Sent:', cmd);
         } catch (err) {
