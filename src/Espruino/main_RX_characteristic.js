@@ -70,7 +70,9 @@ var receivedCmd = "";
 NRF.setServices({
     0xBCDE: {
         0xABCD: {
-            value: "test message",
+            description: "TX: AT cmd config",
+            value: "",
+            maxLen: 100,
             writable: true,
             onWrite: function (evt) {
                 receivedCmd = "";
@@ -110,20 +112,16 @@ NRF.setServices({
                 }
             }
         },
-      0xABCE: {
-        value: "Read message",
-        readable: true,
-        notify: true,
-        onRead: function (evt) {
-          NRF.updateServices({
-            0xBCDE : {
-              0xABCE : {
-                value : "Puck AT RX Service"
-              }
-            }});
-          return "Assistive Puck Device";
+        0xABCE: {
+            description: "RX: AT cmd response",
+            value: "",
+            maxLen: 100,
+            readable: true,
+            notify: true,
+            onRead: function (evt) {
+                return "RX: AT cmd";
+            }
         }
-      }
     }
 }, {// Add HID service
     // Advertise 0xBCDE service alongside HID
