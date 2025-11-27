@@ -70,7 +70,7 @@ var receivedCmd = "";
 NRF.setServices({
     0xBCDE: {
         0xABCD: {
-            value: "",
+            value: "test message",
             writable: true,
             onWrite: function (evt) {
                 receivedCmd = "";
@@ -84,13 +84,7 @@ NRF.setServices({
                     return;
                 }
                 console.log("RCV cmd: "+receivedCmd);
-                NRF.updateServices({
-                  0xBCDE : {
-                    0xABCE : {
-                      value : receivedCmd,
-                      notify: true
-                    }
-                }});
+                notifyUI(receivedCmd);
 
                 // Basic validation of command format
                 if (!receivedCmd.includes(":")) {
@@ -116,18 +110,18 @@ NRF.setServices({
                 }
             }
         },
-        0xABCE: {
+      0xABCE: {
         value: "Read message",
         readable: true,
         notify: true,
         onRead: function (evt) {
-            NRF.updateServices({
+          NRF.updateServices({
             0xBCDE : {
-                0xABCE : {
+              0xABCE : {
                 value : "Puck AT RX Service"
-                }
+              }
             }});
-            return "Assistive Puck Device";
+          return "Assistive Puck Device";
         }
       }
     }
@@ -148,6 +142,22 @@ NRF.setAdvertising([
     // URL to configuration website
     [eddystone.get("https://l1nq.com/jtNjc")]
 ]);
+
+// Notify UI with message via RX BLE characteristic 0xABCE (service 0xBCDE)
+// msg: string message to send
+// Example usage: notifyUI("Command executed");
+// Note: Ensure the message length does not exceed BLE characteristic limits
+// (typically 20 bytes for BLE 4.0)
+function notifyUI(msg) {
+    NRF.updateServices({
+        0xBCDE : {
+            0xABCE : {
+                value : msg,
+                notify: true
+            }
+        }
+    });
+}
 
 // Move mouse action with error handling
 function moveMouseAction(x, y, b) {
