@@ -5,7 +5,7 @@
 // Commands can be configured via a custom BLE service.
 // Supported commands include key presses and mouse actions.
 
-const DEBUG=0; //enable to see console.log messages
+const DEBUG = 0; //enable to see console.log messages
 
 // Load necessary modules
 // ble_hid_combo provides combined keyboard and mouse HID functionality
@@ -17,13 +17,87 @@ var eddystone = require("ble_eddystone");
 // SWButton.js is a custom javascript module and handles button press patterns (single, double, long press).
 // SWButton.js must be stored in the device's storage with the name 'SWButton' using the Espruino IDE.
 //var SWBtn = require("SWButton");
-var SWBtn=require("https://inclusion-international.github.io/Wheely-Joystick-Mouse/src/Espruino/SWBtn.js");
+var SWBtn = require("https://inclusion-international.github.io/Wheely-Joystick-Mouse/src/Espruino/SWBtn.js");
 
 // Default commands for button press patterns
 // S - single press: left click, SS - double press: double click, L - long press: right click
 // These can be overridden by stored commands in persistent storage
 var defaultStoreCommands = { "S": "AT CL", "SS": "AT CD", "L": "AT CR" };
 var storeCommands = { "S": "", "SS": "", "L": "" };
+
+// Mock answer for "AT LA" command, so that the FABI UI continues to work
+// This is a static example and does not reflect actual stored commands
+var mock_CMD_AT_LA_answer = [
+    "Slot:default",
+    "AT WS 3",
+    "AT SC 0xffffff",
+    "AT TS 0",
+    "AT TP 1023",
+    "AT TT 0",
+    "AT AP 5",
+    "AT AR 2",
+    "AT AI 1",
+    "AT BT 1",
+    "AT DP 0",
+    "AT AD 0",
+    "AT BM 01",
+    "AT HL",
+    "AT BM 02",
+    "AT HR",
+    "AT BM 03",
+    "AT HL",
+    "AT BM 04",
+    "AT HL",
+    "AT BM 05",
+    "AT HL",
+    "AT BM 06",
+    "AT HL",
+    "AT BM 07",
+    "AT HL",
+    "AT BM 08",
+    "AT HL",
+    "AT BM 09",
+    "AT HL",
+    "AT BM 10",
+    "AT HL",
+    "AT BM 11",
+    "AT HL",
+    "Slot:neuer_slot",
+    "AT WS 3",
+    "AT SC 0xffffff",
+    "AT TS 0",
+    "AT TP 1023",
+    "AT TT 0",
+    "AT AP 5",
+    "AT AR 2",
+    "AT AI 1",
+    "AT BT 1",
+    "AT DP 0",
+    "AT AD 0",
+    "AT BM 01",
+    "AT HR",
+    "AT BM 02",
+    "AT HR",
+    "AT BM 03",
+    "AT HL",
+    "AT BM 04",
+    "AT HL",
+    "AT BM 05",
+    "AT HL",
+    "AT BM 06",
+    "AT HL",
+    "AT BM 07",
+    "AT HL",
+    "AT BM 08",
+    "AT HL",
+    "AT BM 09",
+    "AT HL",
+    "AT BM 10",
+    "AT HL",
+    "AT BM 11",
+    "AT HL",
+    "END"
+];
 
 // Read stored commands for each button press pattern from persistent storage
 function loadStoredCommands() {
@@ -85,8 +159,20 @@ NRF.setServices({
                     console.log("Empty command received, ignoring.");
                     return;
                 }
-                console.log("RCV cmd: "+receivedCmd);
-                notifyUI(receivedCmd);
+
+                console.log("RCV cmd: " + receivedCmd);
+                //notifyUI(receivedCmd);
+                if (receivedCmd === "AT ID") {
+                    answr = "FABI v3.7, PressureSensor=None, ForceSensor=None";
+                    notifyUI(answr);
+                } else if (receivedCmd === "AT LA") {
+                    for (let i = 0; i < mock_CMD_AT_LA_answer.length; i++) {
+                        answr = mock_CMD_AT_LA_answer[i];
+                        notifyUI(answr);
+                    }
+                } else {
+                    notifyUI(receivedCmd);
+                }
 
                 // Basic validation of command format
                 if (!receivedCmd.includes(":")) {
@@ -147,10 +233,11 @@ NRF.setAdvertising([
 // Note: Ensure the message length does not exceed BLE characteristic limits
 // (typically 20 bytes for BLE 4.0)
 function notifyUI(msg) {
+    // Append newline at the end of the message as end of line indicator (expected by FABI UI)
     NRF.updateServices({
-        0xBCDE : {
-            0xABCE : {
-                value : msg,
+        0xBCDE: {
+            0xABCE: {
+                value: msg + "\n",
                 notify: true
             }
         }
@@ -163,8 +250,8 @@ function moveMouseAction(x, y, b) {
         HID.moveMouse(x, y, b);
     } catch (err) {
         digitalPulse(LED1, 1, 300);
-        if(DEBUG==1) console.log("Cannot send mouse function, connected as HID device? Reason: " + err.message);
-      }
+        if (DEBUG == 1) console.log("Cannot send mouse function, connected as HID device? Reason: " + err.message);
+    }
 }
 
 function clickButtonAction(b) {
@@ -172,17 +259,17 @@ function clickButtonAction(b) {
         HID.clickButton(b);
     } catch (err) {
         digitalPulse(LED1, 1, 300);
-        if(DEBUG==1) console.log("Cannot send mouse click, connected as HID device? Reason: " + err.message);
+        if (DEBUG == 1) console.log("Cannot send mouse click, connected as HID device? Reason: " + err.message);
     }
 }
 
 function tapKeyAction(k) {
     try {
-        if(DEBUG==1) console.log("Sending key: "+k);
+        if (DEBUG == 1) console.log("Sending key: " + k);
         HID.tapKey(k);
     } catch (err) {
         digitalPulse(LED1, 1, 300);
-        if(DEBUG==1) console.log("Cannot send key tap, connected as HID device? Reason: " + err.message);
+        if (DEBUG == 1) console.log("Cannot send key tap, connected as HID device? Reason: " + err.message);
     }
 }
 
@@ -191,11 +278,11 @@ function executeNextCommand(mode) {
     var command = storeCommands[mode];
 
     if (!command || typeof command !== "string") {
-        if(DEBUG==1) console.log("Invalid command format:", JSON.stringify(command));
+        if (DEBUG == 1) console.log("Invalid command format:", JSON.stringify(command));
         return;
     }
 
-    if(DEBUG==1) console.log("Executing command:", command);
+    if (DEBUG == 1) console.log("Executing command:", command);
 
     let parts = command.split(" ");
     if (parts[0] === "AT") {
@@ -204,15 +291,15 @@ function executeNextCommand(mode) {
                 let key = parts.slice(2).join(" ").toUpperCase();
 
                 if (!HID.KEY[key]) {
-                    if(DEBUG==1) console.log("Unknown key:", key);
+                    if (DEBUG == 1) console.log("Unknown key:", key);
                     return;
                 }
 
                 try {
                     tapKeyAction(HID.KEY[key]);
-                    if(DEBUG==1) console.log("Key pressed:", key);
+                    if (DEBUG == 1) console.log("Key pressed:", key);
                 } catch (e) {
-                    if(DEBUG==1) console.log("Error pressing key:", e);
+                    if (DEBUG == 1) console.log("Error pressing key:", e);
                 }
             } else if (parts[1] === "CL") {
                 clickButtonAction(HID.BUTTON.LEFT);
@@ -230,13 +317,13 @@ function executeNextCommand(mode) {
             } else if (parts[1] === "DRAG") {
                 moveMouseAction(10, 10, 0);
             } else {
-                if(DEBUG==1) console.log("Unknown AT command:", command);
+                if (DEBUG == 1) console.log("Unknown AT command:", command);
             }
         } catch (err) {
-            if(DEBUG==1) console.log("Cannot send HID function, connected as HID device? Reason: " + err.message);
+            if (DEBUG == 1) console.log("Cannot send HID function, connected as HID device? Reason: " + err.message);
         }
     } else {
-        if(DEBUG==1) console.log("Invalid command format:", command);
+        if (DEBUG == 1) console.log("Invalid command format:", command);
     }
 }
 
@@ -245,7 +332,7 @@ function executeNextCommand(mode) {
 
 // Instantiate SWButton object and initialize it with callback for press patterns
 var myButton = new SWBtn(function (k) {
-    if(DEBUG==1) console.log("Button press pattern detected:", k);
+    if (DEBUG == 1) console.log("Button press pattern detected:", k);
     executeNextCommand(k);
 });
 
@@ -266,28 +353,28 @@ function updateKeyPressDegree(a) {
     var keyToTap;
     if (a.roll > sensitivity) {
         LED2.set();
-        keyToTap=HID.KEY.DOWN;
+        keyToTap = HID.KEY.DOWN;
     } else if (a.roll < -sensitivity) {
         LED2.set();
-        keyToTap=HID.KEY.UP;
+        keyToTap = HID.KEY.UP;
     } else if (a.pitch > sensitivity) {
         LED3.set();
-        keyToTap=HID.KEY.RIGHT;
+        keyToTap = HID.KEY.RIGHT;
     } else if (a.pitch < -sensitivity) {
         LED3.set();
-        keyToTap=HID.KEY.LEFT;
+        keyToTap = HID.KEY.LEFT;
     }
-    if(DEBUG==1) console.log("keyToTap: "+keyToTap+" a.roll: "+a.roll+" a.pitch: "+a.pitch);
-    if(!sendHIDIntervalFunction && keyToTap) {
-        if(DEBUG==1) console.log("Starting repeated key presses for key: "+keyToTap);
+    if (DEBUG == 1) console.log("keyToTap: " + keyToTap + " a.roll: " + a.roll + " a.pitch: " + a.pitch);
+    if (!sendHIDIntervalFunction && keyToTap) {
+        if (DEBUG == 1) console.log("Starting repeated key presses for key: " + keyToTap);
         // Initial key press
         tapKeyAction(keyToTap);
         // Repeated key presses
         sendHIDIntervalFunction = setInterval(() => tapKeyAction(keyToTap), keyboardSendInterval);
-    } else if(!keyToTap) {
+    } else if (!keyToTap) {
         // No significant tilt, stop repeated key presses
-        if(DEBUG==1) console.log("Stopping repeated key presses");
-        if(sendHIDIntervalFunction) {
+        if (DEBUG == 1) console.log("Stopping repeated key presses");
+        if (sendHIDIntervalFunction) {
             clearInterval(sendHIDIntervalFunction);
         }
         sendHIDIntervalFunction = undefined;
@@ -342,7 +429,7 @@ NRF.on('connect', function (addr) {
     // Enable accelerometer with default frequency only when connected
     digitalPulse(LED2, 1, 500);
     AHRS.init();
-    
+
     // Start checking tilt for mouse movement or keyboard input depending on tilt level
     //startCheckTiltInterval(updateKeyPressDegree, checkTiltInterval);
     startCheckTiltInterval(updateMouseMovementDegree, mouseMoveInterval);
@@ -352,7 +439,7 @@ NRF.on('connect', function (addr) {
 NRF.on('disconnect', function (reason) {
     console.log("Disconnected, reason:", reason);
     // Turn off accelerometer to save power when not connected
-    digitalPulse(LED3, 1, 500);    
+    digitalPulse(LED3, 1, 500);
     Puck.accelOff();
     // Stop checking tilt level for mouse movement or keyboard input
     stopCheckTiltInterval();
@@ -360,31 +447,31 @@ NRF.on('disconnect', function (reason) {
 
 //Start AHRS algorithm
 //var AHRS = require("AHRS");
-var AHRS=require("https://inclusion-international.github.io/Wheely-Joystick-Mouse/src/Espruino/AHRS.js");
+var AHRS = require("https://inclusion-international.github.io/Wheely-Joystick-Mouse/src/Espruino/AHRS.js");
 AHRS.init();
 
 // Interval function to check tilt and call provided function
 var checkTiltIntervalFunction;
 // Starts an interval to check tilt and call the provided function
 function startCheckTiltInterval(checkFunction, checkInterval) {
-    if(!checkTiltIntervalFunction) {
+    if (!checkTiltIntervalFunction) {
         console.log("Starting checkTiltIntervalFunction");
         checkTiltIntervalFunction = setInterval(() => {
             var orientation = AHRS.getOrientationDegree();
-            if(DEBUG==1) {
-                console.log("Roll:", orientation.roll.toFixed(2),"Pitch:", orientation.pitch.toFixed(2),"Yaw:", orientation.yaw.toFixed(2));
-            }   
+            if (DEBUG == 1) {
+                console.log("Roll:", orientation.roll.toFixed(2), "Pitch:", orientation.pitch.toFixed(2), "Yaw:", orientation.yaw.toFixed(2));
+            }
             checkFunction(orientation);
         }, checkInterval);
     }
 }
 // Stops the tilt checking interval
 function stopCheckTiltInterval() {
-  if(checkTiltIntervalFunction) {
-    console.log("Stopping checkTiltIntervalFunction");
-    clearInterval(checkTiltIntervalFunction);
-    checkTiltIntervalFunction = undefined;
-  }
+    if (checkTiltIntervalFunction) {
+        console.log("Stopping checkTiltIntervalFunction");
+        clearInterval(checkTiltIntervalFunction);
+        checkTiltIntervalFunction = undefined;
+    }
 }
 
 Serial1.setConsole(true);
