@@ -474,7 +474,7 @@ function stopCheckTiltInterval() {
     }
 }
 
-Serial1.setConsole(true);
+//Serial1.setConsole(true);
 //lowering connection interval reduces bluetooth speed but also reduces power consumption from 665 to 50 (see E.getPowerUsage())
 NRF.setConnectionInterval(100);
 digitalPulse(LED3, 1, 500);
