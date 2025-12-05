@@ -135,6 +135,76 @@ function storeCommand(command, pressType) {
     }
 }
 
+// Handle writes to the TX BLE characteristic 0xABCD (service 0xBCDE)
+// This characteristic receives AT commands to configure button press actions and more.
+// See list of AT commands: https://github.com/asterics/FabiWare/blob/master/src/commands.h
+// Button Press Patterns: S - single press, SS - double press, L - long press
+function onWrite_BLE_TXCharacteristic(evt) {
+    receivedCmd = "";
+    // Convert received data to string
+    var n = new Uint8Array(evt.data);
+    n.forEach((elem) => receivedCmd += String.fromCharCode(elem));
+    receivedCmd = receivedCmd.trim();
+
+    if (!receivedCmd) {
+        console.log("Empty command received, ignoring.");
+        return;
+    }
+
+    console.log("RCV cmd: " + receivedCmd);
+    //notifyUI(receivedCmd);
+    if (receivedCmd === "AT ID") {
+        answr = "FABI v3.7, PressureSensor=None, ForceSensor=None";
+        notifyUI(answr);
+    } else if (receivedCmd === "AT LA") {
+        for (let i = 0; i < mock_CMD_AT_LA_answer.length; i++) {
+            answr = mock_CMD_AT_LA_answer[i];
+            notifyUI(answr);
+        }
+    } else {
+        notifyUI(receivedCmd);
+    }
+
+    // Basic validation of command format
+    if (!receivedCmd.includes(":")) {
+        console.log("Invalid command format (missing ':'):", receivedCmd);
+        return;
+    }
+
+    // Split into press type and command
+    let parts = receivedCmd.split(":");
+    if (parts.length === 2) {
+        let pressType = parts[0].trim();
+        let command = parts[1].trim();
+
+        if (!["S", "SS", "L"].includes(pressType)) {
+            console.log("Unknown press type:", pressType);
+            return;
+        }
+
+        // Store the command
+        storeCommand(command, pressType);
+    } else {
+        console.log("Invalid command format:", receivedCmd);
+    }
+}
+// Notify UI with message via RX BLE characteristic 0xABCE (service 0xBCDE)
+// msg: string message to send
+// Example usage: notifyUI("Command executed");
+// Note: Ensure the message length does not exceed BLE characteristic limits
+// (typically 20 bytes for BLE 4.0)
+function notifyUI(msg) {
+    // Append newline at the end of the message as end of line indicator (expected by FABI UI)
+    NRF.updateServices({
+        0xBCDE: {
+            0xABCE: {
+                value: msg + "\n",
+                notify: true
+            }
+        }
+    });
+}
+
 // Create additional BLE service for receiving commands
 // Command format: S: AT KP A
 // S - single press, SS - double press, L - long press
@@ -148,55 +218,7 @@ NRF.setServices({
             value: "",
             maxLen: 100,
             writable: true,
-            onWrite: function (evt) {
-                receivedCmd = "";
-                // Convert received data to string
-                var n = new Uint8Array(evt.data);
-                n.forEach((elem) => receivedCmd += String.fromCharCode(elem));
-                receivedCmd = receivedCmd.trim();
-
-                if (!receivedCmd) {
-                    console.log("Empty command received, ignoring.");
-                    return;
-                }
-
-                console.log("RCV cmd: " + receivedCmd);
-                //notifyUI(receivedCmd);
-                if (receivedCmd === "AT ID") {
-                    answr = "FABI v3.7, PressureSensor=None, ForceSensor=None";
-                    notifyUI(answr);
-                } else if (receivedCmd === "AT LA") {
-                    for (let i = 0; i < mock_CMD_AT_LA_answer.length; i++) {
-                        answr = mock_CMD_AT_LA_answer[i];
-                        notifyUI(answr);
-                    }
-                } else {
-                    notifyUI(receivedCmd);
-                }
-
-                // Basic validation of command format
-                if (!receivedCmd.includes(":")) {
-                    console.log("Invalid command format (missing ':'):", receivedCmd);
-                    return;
-                }
-
-                // Split into press type and command
-                let parts = receivedCmd.split(":");
-                if (parts.length === 2) {
-                    let pressType = parts[0].trim();
-                    let command = parts[1].trim();
-
-                    if (!["S", "SS", "L"].includes(pressType)) {
-                        console.log("Unknown press type:", pressType);
-                        return;
-                    }
-
-                    // Store the command
-                    storeCommand(command, pressType);
-                } else {
-                    console.log("Invalid command format:", receivedCmd);
-                }
-            }
+            onWrite: onWrite_BLE_TXCharacteristic
         },
         0xABCE: {
             description: "RX: AT cmd response",
@@ -226,23 +248,6 @@ NRF.setAdvertising([
     // URL to configuration website
     [eddystone.get("https://l1nq.com/jtNjc")]
 ]);
-
-// Notify UI with message via RX BLE characteristic 0xABCE (service 0xBCDE)
-// msg: string message to send
-// Example usage: notifyUI("Command executed");
-// Note: Ensure the message length does not exceed BLE characteristic limits
-// (typically 20 bytes for BLE 4.0)
-function notifyUI(msg) {
-    // Append newline at the end of the message as end of line indicator (expected by FABI UI)
-    NRF.updateServices({
-        0xBCDE: {
-            0xABCE: {
-                value: msg + "\n",
-                notify: true
-            }
-        }
-    });
-}
 
 // Move mouse action with error handling
 function moveMouseAction(x, y, b) {
