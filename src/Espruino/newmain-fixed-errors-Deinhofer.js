@@ -338,6 +338,6 @@ NRF.on('disconnect', function (reason) {
 });
 
 //Set to Serial1.setConsole if connected via serial interface
-Serial1.setConsole(true);
+//Serial1.setConsole(true);
 console.log("FABI-compatible Puck.js ready (queued RX + GET TILT).");
 console.log("i am");
